@@ -1,4 +1,4 @@
 scripts/dev/vars.py
 **/__pycache__
 **/.ipynb_checkpoints
-**/.minio.sys
+data/.minio.sys
