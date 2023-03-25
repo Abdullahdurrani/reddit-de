@@ -1,5 +1,6 @@
 from pyspark.sql.functions import col, explode_outer
 from pyspark.sql.types import StructType, ArrayType
+from vars import *
 
 def flatten_json(df, json_column_name):
     # gets all fields of StructType or ArrayType in the nested_fields dictionary
@@ -35,3 +36,12 @@ def flatten_json(df, json_column_name):
     for df_col_name in df.columns:
         df = df.withColumnRenamed(df_col_name, df_col_name.replace("transformedJSON", json_column_name))
     return df
+
+def loadConfigs(sparkContext):
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", minio_access_key)
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", minio_secret_key)
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", minio_endpoint)
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.path.style.access", "true")
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.connection.ssl.enabled", "false")
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.connection.ssl.enabled", "false")
