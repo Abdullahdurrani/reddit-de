@@ -2,6 +2,7 @@ from pyspark.sql.functions import col, explode_outer
 from pyspark.sql.types import StructType, ArrayType
 import requests
 from vars import *
+import boto3
 
 def flatten_json(df, json_column_name):
     # gets all fields of StructType or ArrayType in the nested_fields dictionary
@@ -70,3 +71,12 @@ def reddit_connection():
     headers = {**headers, **{'Authorization': f"bearer {TOKEN}"}}
 
     return headers
+
+def minio_connection():
+    # Create a boto3 client for MinIO
+    minio_client = boto3.client('s3',
+                            endpoint_url=minio_endpoint,
+                            aws_access_key_id=minio_access_key,
+                            aws_secret_access_key=minio_secret_key,
+                            region_name=minio_region)
+    return minio_client

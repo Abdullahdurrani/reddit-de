@@ -61,8 +61,18 @@ try:
            'data>children>data>preview>images>variants>obfuscated>resolutions>width','data>children>data>preview>images>variants>obfuscated>source>height',
            'data>children>data>preview>images>variants>obfuscated>source>url','data>children>data>preview>images>variants>obfuscated>source>width']
 
-    flatten_df = flatten_df.withColumn("dateid", lit(dateid))
+    df_data = flatten_df.select(columns)
 
-    flatten_df.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/processed/popular_{today}.parquet")
+    df_data_dedup = df_data.dropDuplicates()
+
+    new_columns = [c.replace('>', '_') for c in df_data_dedup.columns]
+    df_renamed = df_data_dedup.toDF(*new_columns)
+
+    new_columns = [c.replace('data_children_data_', '') for c in df_renamed.columns]
+    df_renamed = df_renamed.toDF(*new_columns)
+    
+    df_final = df_renamed.withColumn("dateid", lit(dateid))
+
+    df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/processed/popular_{today}.parquet")
 except Exception as e:
     print(e)

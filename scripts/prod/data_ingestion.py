@@ -1,9 +1,8 @@
 from vars import *
 import json
-import boto3
 import requests
 from datetime import date
-from functions import reddit_connection
+from functions import reddit_connection, minio_connection
 
 headers = reddit_connection()
 
@@ -17,16 +16,11 @@ data = res.json()
 # Convert the JSON data to a string
 json_data = json.dumps(data)
 
-# Create a boto3 client for MinIO
-s3_client = boto3.client('s3',
-                         endpoint_url=minio_endpoint,
-                         aws_access_key_id=minio_access_key,
-                         aws_secret_access_key=minio_secret_key,
-                         region_name=minio_region)
+minio_client = minio_connection()
 
 file_date = date.today().strftime('%Y%m%d')
 
 # Upload the JSON data to the MinIO bucket
-s3_client.put_object(Bucket=minio_bucket,
+minio_client.put_object(Bucket=minio_bucket,
                      Key=f'raw/popular_{file_date}.json',
                      Body=json_data.encode('utf-8'))
