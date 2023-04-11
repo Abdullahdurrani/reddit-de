@@ -14,7 +14,7 @@ res = requests.get("https://oauth.reddit.com/r/popular",
 # Get the JSON data from the response
 data = res.json()
 
-# Convert the JSON data to a string
+# Convert the JSON data to a string to not get TypeError while writing
 json_data = json.dumps(data)
 
 # Create a boto3 client for MinIO

@@ -2,3 +2,4 @@ scripts/vars.py
 **/__pycache__
 **/.ipynb_checkpoints
 data/.minio.sys
+**/data
