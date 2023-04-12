@@ -3,3 +3,4 @@ scripts/vars.py
 **/.ipynb_checkpoints
 data/.minio.sys
 **/data
+scripts/dev/vars.py
