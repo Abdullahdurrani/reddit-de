@@ -1,2 +1,2 @@
-boto3==1.26.97
-requests==2.28.1
+apache-airflow-providers-apache-spark
+findspark

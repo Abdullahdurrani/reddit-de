@@ -4,4 +4,9 @@ scripts/vars.py
 data/.minio.sys
 **/data
 scripts/dev/vars.py
-airflow/logs
+airflow/logs/
+**/vars.py
+**/logs
+**/plugins
+**/.env
+**/.vscode
