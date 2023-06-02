@@ -16,10 +16,9 @@ dag = DAG('my_dag', description = 'spark test', catchup = False, schedule_interv
 
 jars = 'opt/airflow/dags/'
 
-s1 = SparkSubmitOperator(
-    task_id = "spark-job",
-    application = "${AIRFLOW_HOME}/usr/local/scripts/spark-app.py ",
-    jars = jars,
-    conn_id = "spark_default",
-    dag = dag
+task_load_popular = SparkSubmitOperator(
+    task_id='load_popular',
+    application='./scripts/prod/load_popular.py',
+    conn_id='spark_default',
+    dag=dag
 )

@@ -4,15 +4,15 @@ from datetime import date
 from functions import loadConfigs
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import explode
+from columns import awardings
 
 spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .config("spark.jars", "/jars/postgresql-42.2.5.jar") \
     .getOrCreate()
 loadConfigs(spark.sparkContext)
 
 today = date.today().strftime('%Y%m%d')
-today = 20230326
+# today = 20230326
 
 output_folder = "awardings"
 output_file = "awardings"
@@ -35,9 +35,10 @@ columns_to_drop = ["resized_icons","resized_static_icons","icon_format","icon_he
                    "static_icon_url","static_icon_width","sticky_duration_seconds"]
 
 df_final = df_awardings_cleaned.drop(*[col for col in df_awardings_cleaned.columns if any(s in col for s in columns_to_drop)])
-
 df_final = df_final.dropDuplicates()
 
 df_final = df_final.withColumn("dateid", lit(today))
+
+df_final = df_final.select(awardings)
 
 df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/processed/{output_folder}/{output_file}_{today}")

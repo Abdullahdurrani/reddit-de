@@ -4,15 +4,15 @@ from datetime import date
 from functions import loadConfigs
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import explode
+from columns import gildings
 
 spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .config("spark.jars", "/jars/postgresql-42.2.5.jar") \
     .getOrCreate()
 loadConfigs(spark.sparkContext)
 
 today = date.today().strftime('%Y%m%d')
-today = 20230326
+# today = 20230326
 
 output_folder = "gildings"
 output_file = "gildings"
@@ -35,5 +35,7 @@ df_renamed = df_gildings.withColumnRenamed("gid_1", "gild_silver") \
 df_final = df_renamed.dropDuplicates()
 
 df_final = df_final.withColumn("dateid", lit(today))
+
+df_final = df_final.select(gildings)
 
 df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/processed/{output_folder}/{output_file}_{today}")

@@ -7,7 +7,7 @@ from functions import reddit_connection, minio_connection
 headers = reddit_connection()
 
 # Send a GET request to get the hot posts in the "popular" subreddit
-res = requests.get("https://oauth.reddit.com/r/popular",
+res = requests.get("https://oauth.reddit.com/r/popular?limit=100",
                    headers=headers)
 
 # Get the JSON data from the response

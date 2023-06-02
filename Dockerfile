@@ -25,6 +25,7 @@ USER root
 RUN curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/hadoop-aws-3.3.4.jar && \
     curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/aws-java-sdk-bundle-1.12.262.jar && \
     curl https://repo1.maven.org/maven2/net/java/dev/jets3t/jets3t/0.9.4/jets3t-0.9.4.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/jets3t-0.9.4.jar  && \
-    curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.12.262/aws-java-sdk-1.12.262.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/aws-java-sdk-1.12.262.jar
+    curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.12.262/aws-java-sdk-1.12.262.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/aws-java-sdk-1.12.262.jar && \
+    curl https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/postgresql-42.2.5.jar
 
 USER airflow
