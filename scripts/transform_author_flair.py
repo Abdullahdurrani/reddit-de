@@ -7,6 +7,7 @@ from pyspark.sql.functions import explode
 from columns import author_flair
 
 spark = SparkSession.builder \
+    .master('local[1]') \
     .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
     .getOrCreate()
 loadConfigs(spark.sparkContext)
@@ -18,7 +19,7 @@ output_folder = "author_flair"
 output_file = "author_flair"
 
 df_raw = spark.read.option("header", "true") \
-    .json(f"s3a://{minio_bucket}/raw/popular_{today}.json")
+    .json(f"s3a://{minio_bucket}/bronze/popular_{today}.json")
 
 df_raw = df_raw.select(explode(df_raw.data.children.data).alias("data"))
 df_raw = df_raw.select("data.*")
@@ -46,4 +47,4 @@ df_final = df_final.withColumn("dateid", lit(today))
 
 df_final = df_final.select(author_flair)
 
-df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/processed/{output_folder}/{output_file}_{today}")
+df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/silver/{output_folder}/{output_file}_{today}")
