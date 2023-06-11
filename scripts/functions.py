@@ -2,15 +2,19 @@ import requests
 from vars import *
 import boto3
 
-def loadConfigs(sparkContext):
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", minio_access_key)
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", minio_secret_key)
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", minio_endpoint)
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.path.style.access", "true")
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.connection.ssl.enabled", "false")
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-    sparkContext._jsc.hadoopConfiguration().set("fs.s3a.connection.ssl.enabled", "false")
-
+def loadConfigs(builder):
+    builder.config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
+           .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+           .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
+           .config("spark.jars.packages", "/usr/local/spark/jars/delta-core_2.12-2.4.0.jar") \
+           .config("spark.hadoop.fs.s3a.access.key", minio_access_key) \
+           .config("spark.hadoop.fs.s3a.secret.key", minio_secret_key) \
+           .config("spark.hadoop.fs.s3a.endpoint", minio_endpoint) \
+           .config("spark.hadoop.fs.s3a.path.style.access", "true") \
+           .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false") \
+           .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+    return builder
+    
 def reddit_connection():
     # Use HTTPBasicAuth to authenticate the request with the Reddit API
     auth = requests.auth.HTTPBasicAuth(personal_use_script, secret_token)

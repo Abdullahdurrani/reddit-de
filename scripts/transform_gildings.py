@@ -30,7 +30,8 @@ df_gildings = df_raw.select("id", "author", "gilded", "gildings") \
 
 df_gildings = df_gildings.select("*", "gildings.*")
 
-df_gildings = df_gildings.withColumn("gid_1", lit(None).cast(IntegerType()))
+if "gid_1" not in df_gildings.columns:
+    df_gildings = df_gildings.withColumn("gid_1", lit(None).cast(IntegerType()))
 
 df_renamed = df_gildings.withColumnRenamed("gid_1", "gild_silver") \
                         .withColumnRenamed("gid_2", "gild_gold") \

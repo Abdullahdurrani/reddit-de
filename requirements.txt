@@ -1,2 +1,4 @@
 apache-airflow-providers-apache-spark
 findspark
+delta-spark
+boto3
