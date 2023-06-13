@@ -6,12 +6,10 @@ from pyspark.sql.functions import lit
 from pyspark.sql.functions import explode
 from columns import gildings
 from pyspark.sql.types import IntegerType
+from delta import *
 
-spark = SparkSession.builder \
-    .master('local[1]') \
-    .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .getOrCreate()
-loadConfigs(spark.sparkContext)
+builder = loadConfigs(SparkSession.builder)
+spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
 today = date.today().strftime('%Y%m%d')
 # today = 20230326
@@ -25,7 +23,7 @@ df_raw = spark.read.option("header", "true") \
 df_raw = df_raw.select(explode(df_raw.data.children.data).alias("data"))
 df_raw = df_raw.select("data.*")
 
-df_gildings = df_raw.select("id", "author", "gilded", "gildings") \
+df_gildings = df_raw.select("id", "author", "gilded", "gildings", "is_video", "score", "subreddit_id", "subreddit", "total_awards_received") \
                       .withColumnRenamed("id", "post_id")
 
 df_gildings = df_gildings.select("*", "gildings.*")

@@ -19,16 +19,20 @@ today = date.today().strftime('%Y%m%d')
 
 input_folder = "gildings"
 input_file = "gildings"
+
+# Author data
+
 output_folder = "author_gildings"
-mode = "append"
+output_file = "author_gildings"
 
 df = spark.read.option("header", "true") \
     .parquet(f"s3a://{minio_bucket}/silver/{input_folder}/{input_file}_{today}")
 
-author_df = df.groupBy("author").agg(
+author_df = df.groupBy("author","subreddit_id","subreddit").agg(
     F.sum("gild_silver").alias("total_gild_silver"),
     F.sum("gild_gold").alias("total_gild_gold"),
-    F.sum("gild_platinum").alias("total_gild_platinum")
+    F.sum("gild_platinum").alias("total_gild_platinum"),
+    F.sum("score").alias("total_score")
 )
 
 author_df = author_df.withColumn(
@@ -38,12 +42,17 @@ author_df = author_df.withColumn(
 
 author_df = author_df.withColumn("updated_at", date_format(current_date(), "yyyyMMdd"))
 
-author_df.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/gold/{output_folder}/{output_file}_{today}")
+author_df.write.format("delta").partitionBy("updated_at").mode("overwrite").save(f"s3a://{minio_bucket}/gold/{output_folder}/{output_file}")
 
-post_df = df.groupBy("post_id").agg(
+# Post data
+output_folder = "post_gildings"
+output_file = "post_gildings"
+
+post_df = df.groupBy("post_id","subreddit_id","subreddit").agg(
     F.sum("gild_silver").alias("total_gild_silver"),
     F.sum("gild_gold").alias("total_gild_gold"),
-    F.sum("gild_platinum").alias("total_gild_platinum")
+    F.sum("gild_platinum").alias("total_gild_platinum"),
+    F.sum("score").alias("total_score")
 )
 
 post_df = post_df.withColumn(
@@ -52,3 +61,25 @@ post_df = post_df.withColumn(
 ).orderBy('total_gildings',ascending=False)
 
 post_df = post_df.withColumn("updated_at", date_format(current_date(), "yyyyMMdd"))
+
+post_df.write.format("delta").partitionBy("updated_at").mode("overwrite").save(f"s3a://{minio_bucket}/gold/{output_folder}/{output_file}")
+
+# Subreddit data
+output_folder = "subreddit_gildings"
+output_file = "subreddit_gildings"
+
+subreddit_df = df.groupBy("subreddit_id","subreddit").agg(
+    F.sum("gild_silver").alias("total_gild_silver"),
+    F.sum("gild_gold").alias("total_gild_gold"),
+    F.sum("gild_platinum").alias("total_gild_platinum"),
+    F.sum("score").alias("total_score")
+)
+
+subreddit_df = subreddit_df.withColumn(
+    'total_gildings',
+    F.col('total_gild_silver') + F.col('total_gild_gold') + F.col('total_gild_platinum')
+).orderBy('total_gildings',ascending=False)
+
+subreddit_df = subreddit_df.withColumn("updated_at", date_format(current_date(), "yyyyMMdd"))
+
+subreddit_df.write.format("delta").partitionBy("updated_at").mode("overwrite").save(f"s3a://{minio_bucket}/gold/{output_folder}/{output_file}")

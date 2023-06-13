@@ -27,6 +27,7 @@ RUN curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoo
     curl https://repo1.maven.org/maven2/net/java/dev/jets3t/jets3t/0.9.4/jets3t-0.9.4.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/jets3t-0.9.4.jar  && \
     curl https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/1.12.262/aws-java-sdk-1.12.262.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/aws-java-sdk-1.12.262.jar && \
     curl https://repo1.maven.org/maven2/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/postgresql-42.2.5.jar && \
-    curl https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.4.0/delta-core_2.12-2.4.0.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/delta-core_2.12-2.4.0.jar
+    curl https://repo1.maven.org/maven2/io/delta/delta-core_2.12/2.4.0/delta-core_2.12-2.4.0.jar --output /home/airflow/.local/lib/python3.9/site-packages/pyspark/jars/delta-core_2.12-2.4.0.jar && \
+    curl https://repo1.maven.org/maven2/io/delta/delta-storage/2.4.0/delta-storage-2.4.0.jar --output /usr/local/spark/jars/delta-storage-2.4.0.jar
 
 USER airflow

@@ -34,6 +34,8 @@ columns_to_drop = flair_list + ["all_awardings","author_flair_richtext","author_
 
 df_cleaned = df_raw.drop(*[col for col in df_raw.columns if any(s in col for s in columns_to_drop)])
 
+df_cleaned = df_cleaned.withColumnRenamed("id", "post_id")
+
 df_final = df_cleaned.dropDuplicates()
 df_final = df_final.withColumn("dateid", lit(today))
 
