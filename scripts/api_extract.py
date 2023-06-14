@@ -22,5 +22,5 @@ file_date = date.today().strftime('%Y%m%d')
 
 # Upload the JSON data to the MinIO bucket
 minio_client.put_object(Bucket=minio_bucket,
-                     Key=f'bronze/popular_{file_date}.json',
+                     Key=f'landing/popular_{file_date}.json',
                      Body=json_data.encode('utf-8'))

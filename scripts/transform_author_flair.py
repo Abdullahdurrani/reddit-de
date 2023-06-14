@@ -48,3 +48,4 @@ df_final = df_final.withColumn("dateid", lit(today))
 df_final = df_final.select(author_flair)
 
 df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/silver/{output_folder}/{output_file}_{today}")
+df_final.write.format("delta").mode("overwrite").save(f"s3a://{minio_bucket}/gold/{output_folder}/{output_file}")
