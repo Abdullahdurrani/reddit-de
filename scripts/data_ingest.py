@@ -23,4 +23,8 @@ df_raw = df_raw.select("data.*")
 
 df_final = df_raw.withColumn("dateid", lit(today))
 
-df_final.write.format("delta").mode("overwrite").save(f"s3a://{minio_bucket}/bronze/{output_folder}/{output_file}_{today}")
+df_final.write \
+    .format("delta") \
+    .option("overwriteSchema", "true") \
+    .mode("overwrite") \
+    .save(f"s3a://{minio_bucket}/bronze/{output_folder}/{output_file}_{today}")
