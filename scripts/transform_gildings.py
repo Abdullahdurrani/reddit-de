@@ -8,6 +8,7 @@ from delta import *
 from pyspark.sql.functions import current_date
 from pyspark.sql.functions import month, year
 from pyspark.sql.types import LongType
+from columns import gildings
 
 builder = loadConfigs(SparkSession.builder)
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
@@ -37,8 +38,6 @@ df_clean = df_clean.withColumn("year", year(current_date())) \
                    .withColumn("month", month(current_date())) \
                    .withColumn("created_date", current_date())
 
-# df_clean = df_clean.select(gildings)
-
 columns_to_fill = ["gild_silver","gild_gold", "gild_platinum", "score"]
 df_final = df_clean.na.fill(0, subset=columns_to_fill)
 
@@ -47,6 +46,8 @@ df_final = df_final.drop("gildings")
 df_final = df_final.withColumn("gild_silver", df_final["gild_silver"].cast(LongType()))
 
 df_final = df_final.orderBy('gild_gold', ascending=False)
+
+df_final = df_final.select(gildings)
 
 df_final.write.format("delta") \
         .partitionBy("created_date") \
