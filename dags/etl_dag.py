@@ -10,18 +10,18 @@ default_args = {
     'retries': 0,
 }
 
-dag = DAG('etl_dag', default_args=default_args)
+dag = DAG('etl_dag', default_args=default_args, schedule_interval='30 11 * * *')
 
-task_ingest = BashOperator(
-    task_id='data_ingestion',
-    bash_command='python ./scripts/data_ingestion.py',
+task_extract = BashOperator(
+    task_id='api_extract',
+    bash_command='python ./scripts/api_extract.py',
     dag=dag,
     cwd='/'
 )
 
-task_transform_author = SparkSubmitOperator(
-    task_id='transform_author',
-    application='./scripts/transform_author_flair.py',
+task_ingest = SparkSubmitOperator(
+    task_id='data_ingest',
+    application='./scripts/data_ingest.py',
     conn_id='spark_default',
     dag=dag
 )
@@ -47,13 +47,6 @@ task_transform_popular = SparkSubmitOperator(
     dag=dag
 )
 
-task_load_author = SparkSubmitOperator(
-    task_id='load_author',
-    application='./scripts/load_author_flair.py',
-    conn_id='spark_default',
-    dag=dag
-)
-
 task_load_awardings = SparkSubmitOperator(
     task_id='load_awardings',
     application='./scripts/load_awardings.py',
@@ -75,7 +68,6 @@ task_load_popular = SparkSubmitOperator(
     dag=dag
 )
 
-task_ingest >> task_transform_author >> task_load_author
-task_ingest >> task_transform_awardings >> task_load_awardings
-task_ingest >> task_transform_gildings >> task_load_gildings
-task_ingest >> task_transform_popular >> task_load_popular
+task_extract >> task_ingest >> task_transform_awardings >> task_load_awardings
+task_extract >> task_ingest >> task_transform_gildings >> task_load_gildings
+task_extract >> task_ingest >> task_transform_popular >> task_load_popular

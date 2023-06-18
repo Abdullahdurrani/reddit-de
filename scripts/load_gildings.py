@@ -20,7 +20,7 @@ df = spark.read.format("delta") \
 # Author data
 output_file = "top_authors"
 
-author_df = df.groupBy("year", "month", "subreddit").agg(
+author_df = df.groupBy("year", "month", "author").agg(
     F.sum("gild_silver").alias("total_silver_gilds"),
     F.sum("gild_gold").alias("total_gold_gilds"),
     F.sum("gild_platinum").alias("total_platinum_gilds"),

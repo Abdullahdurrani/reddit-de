@@ -2,43 +2,36 @@ from pyspark.sql import SparkSession
 from vars import *
 from datetime import date
 from functions import loadConfigs
-from pyspark.sql.functions import lit
-from pyspark.sql.functions import explode
+from delta import *
+from pyspark.sql.functions import current_date
+from pyspark.sql.functions import month, year
+from pyspark.sql.functions import col
 from columns import popular
+from pyspark.sql.functions import col, when
 
-spark = SparkSession.builder \
-    .master('local[1]') \
-    .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
-    .getOrCreate()
-loadConfigs(spark.sparkContext)
+
+builder = loadConfigs(SparkSession.builder)
+spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
 today = date.today().strftime('%Y%m%d')
 # today = 20230326
 
-output_folder = "popular"
 output_file = "popular"
 
-df_raw = spark.read.option("header", "true") \
-    .json(f"s3a://{minio_bucket}/bronze/popular_{today}.json")
+df_raw = spark.read.format("delta").load(f"s3a://{minio_bucket}/bronze/popular/popular_{today}")
 
-df_raw = df_raw.select(explode(df_raw.data.children.data).alias("data"))
-df_raw = df_raw.select("data.*")
+df = df_raw.withColumnRenamed("id", "post_id")
 
-columns_list = df_raw.columns
+df = df.withColumn("selftext", when(col("selftext") == "", None).otherwise(col("selftext")))
 
-flair_list = [s for s in columns_list if "_flair" in s or "mod_" in s or "url" in s or "remov" in s]
+df_extend = df.withColumn("year", year(current_date())) \
+                   .withColumn("month", month(current_date())) \
+                   .withColumn("created_date", current_date())
 
-columns_to_drop = flair_list + ["all_awardings","author_flair_richtext","author_is_blocked","gildings","link_flair_richtext","media","preview",
-                                "tournament_data","allow_live_comments","approved_by","banned_at_utc","banned_by","contest_mode",
-                                "thumbnail_height","thumbnail_width","user_reports","treatment_tags","content_categories","awarders","gallery_data"]
+df_final = df_extend.select(popular)
+df_final = df_final.dropDuplicates()
 
-df_cleaned = df_raw.drop(*[col for col in df_raw.columns if any(s in col for s in columns_to_drop)])
-
-df_cleaned = df_cleaned.withColumnRenamed("id", "post_id")
-
-df_final = df_cleaned.dropDuplicates()
-df_final = df_final.withColumn("dateid", lit(today))
-
-df_final = df_final.select(popular)
-
-df_final.write.mode("overwrite").parquet(f"s3a://{minio_bucket}/silver/{output_folder}/{output_file}_{today}")
+df_final.write.format("delta") \
+        .partitionBy("created_date") \
+        .mode("append") \
+        .save(f"s3a://{minio_bucket}/silver/{output_file}")
