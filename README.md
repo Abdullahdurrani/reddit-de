@@ -88,6 +88,14 @@ Jupyter: http://127.0.0.1:8888/lab
 ```
 > To find the token for Jupyter find the `pyspark-jupyter` ID using `docker ps` and then `docker logs <ID>`
 
+6. Create spark connection in airflow.
+Navigate to Admin -> Connections and Create new connection with following details:
+```
+Connection Id: spark_default
+Connection Type: Spark
+Host: spark://localhost:7077
+```
+
 # Conclusion
 This project showcases the process of building an ETL pipeline using the Reddit API, Apache Spark for data transformation, MinIO for data storage, Apache Airflow for orchestration, and Docker for containerization. It provides a robust and scalable solution for extracting, transforming, and loading Reddit data into a DataLake architecture. By following the steps outlined in the [Getting Started](#getting-started) section, you can easily set up and run the pipeline to process Reddit data for further analysis or insights.
 

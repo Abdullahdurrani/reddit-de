@@ -1,4 +1,3 @@
-apache-airflow-providers-apache-spark
-findspark
-delta-spark
+apache-airflow-providers-apache-spark==4.1.0
+delta-spark==2.4.0
 boto3

@@ -10,7 +10,7 @@ default_args = {
     'retries': 0,
 }
 
-dag = DAG('etl_dag', default_args=default_args, schedule_interval='30 11 * * *')
+dag = DAG('etl_dag', default_args=default_args,schedule_interval='30 11 * * *')
 
 task_extract = BashOperator(
     task_id='api_extract',

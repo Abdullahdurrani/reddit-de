@@ -2,8 +2,10 @@ import requests
 from vars import *
 import boto3
 
+
 def loadConfigs(builder):
-    builder.config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
+    builder.master('local[1]') \
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider") \
            .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
            .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
            .config("spark.jars.packages", "/usr/local/spark/jars/delta-core_2.12-2.4.0.jar") \
@@ -14,7 +16,8 @@ def loadConfigs(builder):
            .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false") \
            .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
     return builder
-    
+
+
 def reddit_connection():
     # Use HTTPBasicAuth to authenticate the request with the Reddit API
     auth = requests.auth.HTTPBasicAuth(personal_use_script, secret_token)
@@ -39,11 +42,12 @@ def reddit_connection():
 
     return headers
 
+
 def minio_connection():
     # Create a boto3 client for MinIO
     minio_client = boto3.client('s3',
-                            endpoint_url=minio_endpoint,
-                            aws_access_key_id=minio_access_key,
-                            aws_secret_access_key=minio_secret_key,
-                            region_name=minio_region)
+                                endpoint_url=minio_endpoint,
+                                aws_access_key_id=minio_access_key,
+                                aws_secret_access_key=minio_secret_key,
+                                region_name=minio_region)
     return minio_client

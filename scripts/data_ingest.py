@@ -4,7 +4,7 @@ from datetime import date
 from functions import loadConfigs
 from pyspark.sql.functions import lit
 from pyspark.sql.functions import explode
-from delta import *
+from delta import configure_spark_with_delta_pip
 
 builder = loadConfigs(SparkSession.builder)
 spark = configure_spark_with_delta_pip(builder).getOrCreate()
