@@ -82,8 +82,8 @@ $ docker-compose up
 
 5. Navigate to tools with following URLs.
 ```
-MinIO: http://localhost:9090/
-Airflow: http://localhost:8080
+MinIO: http://localhost:9090/ # username: minioadmin, password: minioadmin
+Airflow: http://localhost:8080 # username: airflow, password: airflow
 Jupyter: http://127.0.0.1:8888/lab
 ```
 > To find the token for Jupyter find the `pyspark-jupyter` ID using `docker ps` and then `docker logs <ID>`
